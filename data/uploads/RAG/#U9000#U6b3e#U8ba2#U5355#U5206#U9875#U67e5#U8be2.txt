@@ -1,0 +1,174 @@
+
+# 1.退款订单分页查询接口介绍
+商城系统退款订单分页查询
+
+# 2.基本信息
+名称	内容
+生产接口地址	https://payapi.inflyway.com/paycenter/api/refund/page/query
+测试接口地址	https://test.inflyway.com/paycenter/api/refund/page/query
+类型	JSON
+METHOD	POST
+
+# 3.参数
+3.1 Header
+参数名	是否必须	说明	示例
+Content-Type	是	指定参数类型	application/json
+Authorization	是	Basic xxxx	商户认证 merchant_id加secret_key，中间逗号:分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供）
+user-agent	是	用户支付请求中请求头user-agent	必传
+3.2 Body
+字段名	数据类型	是否必传	说明
+page_num	数字类型	是	页码
+page_size	数字类型	是	页条数（最大50）
+invoice_id	字符串	否	支付单业务单号
+refund_order_id	字符串	否	退款单号
+request_id	字符串	否	商户退款请求唯一请求ID
+create_time_begin	字符串	否	开始时间，时间格式：2025-06-25 00:00:00
+create_time_end	字符串	否	截止时间，时间格式：2025-06-25 00:00:00
+
+# 4.响应
+字段名	数据类型	是否必传	是否参与hash	说明
+code	字符串	是	是	返回码 2000-成功，其他-失败
+message	字符串	是	否	返回信息
+page_num	数字	是	是	页码
+page_size	数字	是	是	页大小
+total_count	数字	是	是	总条数
+merchant_id	字符串	是	是	商户ID
+hash	字符串	是	否	验签hash
+data	数组	是	否	数据
+data.merchant_id	字符串	是	否	商户ID
+data.merchant_name	字符串	是	否	商户名称
+data.pay_order_id	字符串	是	否	支付单ID
+data.refund_order_id	字符串	是	否	退款单ID
+data.merchant_request_id	字符串	是	否	退款请求ID
+data.order_no	字符串	是	否	业务单号
+data.invoice_id	字符串	是	否	支付业务单号
+data.create_time	字符串	是	否	创建时间
+data.refund_amount	数字	是	否	退款金额
+data.refund_currency	字符串	是	否	退款币种
+data.fee_amount	数字	否	否	手续费金额
+data.fee_currency	字符串	否	否	手续费币种
+data.refund_status	字符串	否	否	退款状态 01-退款成功，02-退款失败
+data.refund_status_desc	字符串	否	否	退款状态描述
+data.refund_failure_msg	字符串	否	否	退款失败原因
+data.arn	字符串	否	否	退款arn
+data.source	字符串	否	否	退款来源
+
+# 5.Example
+{
+  "page_num": 1,
+  "page_size": 5,
+  "refund_order_id": "",
+  "invoice_id": "",
+  "request_id": "",
+  "create_time_begin": "2025-06-25 00:00:00",
+  "create_time_end": "2025-06-27 23:59:59"
+}
+
+# 6.Output
+{
+  "code": "2000",
+  "message": "操作成功",
+  "data": [
+    {
+      "merchant_id": "M200010000001195",
+      "merchant_name": "陈瑛",
+      "pay_order_id": "PO20250624170759667252217",
+      "refund_order_id": "RO20250626142126135015027",
+      "order_no": "1937437536171188226",
+      "invoice_id": "1937437536171188226",
+      "merchant_request_id": null,
+      "refund_amount": 400.0000,
+      "refund_currency": "PHP",
+      "fee_amount": 6.4000,
+      "fee_currency": "USD",
+      "refund_status": "02",
+      "refund_status_desc": "退款失败",
+      "refund_failure_msg": "",
+      "create_time": "2025-06-26 14:21:26",
+      "arn": null,
+      "source": "商户EOS"
+    },
+    {
+      "merchant_id": "M200010000001195",
+      "merchant_name": "陈瑛",
+      "pay_order_id": "PO20250624170649392252197",
+      "refund_order_id": "RO20250626142047076015017",
+      "order_no": "1937437240682471426",
+      "invoice_id": "1937437240682471426",
+      "merchant_request_id": null,
+      "refund_amount": 300.0000,
+      "refund_currency": "SGD",
+      "fee_amount": 51.8800,
+      "fee_currency": "USD",
+      "refund_status": "02",
+      "refund_status_desc": "退款失败",
+      "refund_failure_msg": "",
+      "create_time": "2025-06-26 14:20:47",
+      "arn": null,
+      "source": "商户EOS"
+    },
+    {
+      "merchant_id": "M200010000001195",
+      "merchant_name": "陈瑛",
+      "pay_order_id": "PO20250626102516638253757",
+      "refund_order_id": "RO20250626141733222015007",
+      "order_no": "szg2025062501",
+      "invoice_id": "szg2025062501",
+      "merchant_request_id": null,
+      "refund_amount": 1020.0000,
+      "refund_currency": "USD",
+      "fee_amount": 209.0000,
+      "fee_currency": "USD",
+      "refund_status": "01",
+      "refund_status_desc": "退款成功",
+      "refund_failure_msg": "",
+      "create_time": "2025-06-26 14:17:33",
+      "arn": "74871135177011439670232",
+      "source": "商户EOS"
+    },
+    {
+      "merchant_id": "M200010000001195",
+      "merchant_name": "陈瑛",
+      "pay_order_id": "PO20250626114621038253887",
+      "refund_order_id": "RO20250626115200498014997",
+      "order_no": "202506261145",
+      "invoice_id": "PC1938081367174688770",
+      "merchant_request_id": null,
+      "refund_amount": 1.0000,
+      "refund_currency": "USD",
+      "fee_amount": 5.2000,
+      "fee_currency": "USD",
+      "refund_status": "01",
+      "refund_status_desc": "退款成功",
+      "refund_failure_msg": "",
+      "create_time": "2025-06-26 11:52:00",
+      "arn": "74871135177011439622514",
+      "source": "商户API"
+    },
+    {
+      "merchant_id": "M200010000001195",
+      "merchant_name": "陈瑛",
+      "pay_order_id": "PO20250625175111250253707",
+      "refund_order_id": "RO20250625175530779014987",
+      "order_no": "100577784",
+      "invoice_id": "100577784",
+      "merchant_request_id": null,
+      "refund_amount": 52.1300,
+      "refund_currency": "USD",
+      "fee_amount": 15.4300,
+      "fee_currency": "USD",
+      "refund_status": "01",
+      "refund_status_desc": "退款成功",
+      "refund_failure_msg": "",
+      "create_time": "2025-06-25 17:55:30",
+      "arn": "74871135176011439100918",
+      "source": "商户API"
+    }
+  ],
+  "page_num": 1,
+  "page_size": 5,
+  "total_count": 8,
+  "merchant_id": "M200010000001195",
+  "hash": "47BE6854E5F01A48752F73FB6BC7F704E7E783E5EFBD73BE606FEFDB98C908C5",
+  "success": true
+}

@@ -1,0 +1,83 @@
+# Webhook验签hash方法
+POST异步通知生成签名，具体操作
+
+使用 map 键值对组织需要提交的参数。
+
+按键升序排列值。
+
+将值合成一串,排除空值。
+
+将商户密钥放在值串的最前面。
+
+签名算法使用 sha256(SHA-256)算法,对最终的值串进行签名。
+
+
+# Webhook签名工具类参考如下（java）：
+
+import java.security.MessageDigest; 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List; import java.util.Map;
+public class DigestUtil {
+    /**
+     * 签名方法
+     * @param values 需要进行签名的参数 Map 
+     * @param key 商户秘钥,由 CamelPay颁发
+     * @return
+     */
+    public static String hash(Map<String, String> values, String key) {
+     List<String> fieldNames = new ArrayList<String>(values.keySet()); 
+     Collections.sort(fieldNames);
+        StringBuffer buf = new StringBuffer();
+        buf.append(key);
+        for (Iterator<String> itr = fieldNames.iterator(); itr.hasNext();) {
+            String fieldName = (String) itr.next();
+            String fieldValue = (String) values.get(fieldName);
+            if (null != fieldValue && !fieldValue.trim().equals(""))
+                buf.append(fieldValue);
+        }
+        return hash(buf.toString(), "SHA-256"); }
+    private static String hash(String s, String algorithm) {
+        MessageDigest md5 = null; byte ba[] = (byte[]) null; try {
+            md5 = MessageDigest.getInstance(algorithm);
+            ba = md5.digest(s.getBytes("utf-8")); } catch (Exception exception) {
+        }
+        return hex(ba);
+    }
+    private static String hex(byte input[]) {
+        StringBuffer sb = new StringBuffer(input.length * 2);
+        for (int i = 0; i < input.length; i++) { 
+        sb.append(HEX_TABLE_UPPER[input[i] >> 4 & 0xf]); 
+        sb.append(HEX_TABLE_UPPER[input[i] & 0xf]);
+        }
+        return sb.toString(); }
+    private static final char[] HEX_TABLE_UPPER=
+     { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+}
+
+# webhook 签名方法参考PHP版本如下：
+ // 生成验签所需hash值
+    public function notifySign($data, $api_key)
+    {
+        $hash_src = '';
+        $hash_key = array('amount', 'currency', 'invoice_id', 'merchant_id','status','trans_order_id');
+
+        // 按 key 名进行顺序排序
+        sort($hash_key);
+        foreach ($hash_key as $key) {
+            //! 这里支付那边给了float类型，但是生成hash的时候需要string
+            // 此处float——>string且保留4位小数
+            if (is_float($data[$key])) {
+                $hash_src .= number_format($data[$key],4, '.', '');
+            } else {
+                $hash_src .= $data[$key];
+            }
+        }
+        // 密钥放最前面
+        $hash_src =  $api_key . $hash_src;
+        // sha256 算法
+        $hash = hash('sha256', $hash_src);
+
+        return strtoupper($hash);
+    }

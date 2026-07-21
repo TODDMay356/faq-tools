@@ -1,0 +1,47 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+*.class
+/target/
+### VS Code ###
+.vscode/
+.cursor
+.cursor/**
+
+### Python ###
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+### Secrets & 本地运行时状态（切勿提交） ###
+.env
+robot/.env
+# FAQ 关键词告警运行时动态关键词（本地状态，不入库）
+data/faq_alert_keywords.json

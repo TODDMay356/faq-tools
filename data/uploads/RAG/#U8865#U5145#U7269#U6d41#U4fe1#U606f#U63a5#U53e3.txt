@@ -1,0 +1,64 @@
+
+# 1.补充物流信息介绍
+通过接口补充支付成功的订单相关的物流信息。货物贸易入账需要物流信息，可以在飞来汇后台操作，也可以通过接口批量操作。
+
+# 2.基本信息
+名称	内容
+生产接口地址	https://payapi.inflyway.com/paycenter/api/trade/complete
+测试接口地址	https://test.inflyway.com/paycenter/api/trade/complete
+类型	JSON
+METHOD	POST
+
+# 3.参数
+3.1 Header
+参数名	是否必须	说明	示例
+Content-Type	是	指定参数类型	application/json
+Authorization	是	Basic xxxx	商户认证 merchant_id加secret_key，中间逗号:分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供）
+user-agent	是	用户支付请求中请求头user-agent	必传
+3.2 Body
+字段名	数据类型	是否必传	说明
+merchant_id	字符串	是	商户id
+invoice_id	字符串	是	原始支付请求编号
+shipping_phone	字符串	是	收货人电话
+logistics_company	字符串	是	物流公司
+logistics_no	字符串	是	物流单号,字符数范围 8-30 位,仅允许字母（大小写）、数字
+shipping_name	字符串	是	收货人姓名
+shipping_address_line	字符串	是	收货地址
+shipping_country	字符串	是	国家
+software_info	对象	否	软件服务信息
+software_info.app_store	字符串	是	应用市场，如App Store、安卓等，100个字符以内
+software_info.category	字符串	是	软件类别code，枚举值(含义)：01(软件) 02(游戏)
+software_info.license_no	字符串	否	软件标志号，100个字符以内
+software_info.name	字符串	是	软件名称，100个字符以内
+software_info.developer	字符串	否	开发者信息，100个字符以内
+software_info.launch_date	数字类型	否	上架日期（毫秒）
+software_info.purchase_type	字符串	是	购买类型code，枚举值(含义)：100(订阅) 101(一次性购买)
+software_info.remark	字符串	是	备注，证明贸易真实性的补充备注或者证据链接，500个字符以内
+
+# 4.响应
+字段名	数据类型	是否必传	说明
+data	字符串	是	OK表示提交成功
+
+# 5.Example
+{
+    "merchant_id": "M200010000001013",
+    "invoice_id": "TN1689555279593635842",
+    "shipping_phone": "128787499958",
+    "logistics_company": "DNT",
+    "logistics_no": "LO18929898984",
+    "shipping_name": "jamels bn",
+    "shipping_address_line": "adresss line123455",
+    "shipping_country": "US",
+    "software_info": {
+        "app_store": "安卓",
+        "category": "01",
+        "developer": "tester",
+        "launch_date": 1744617600000,
+        "license_no": "test001",
+        "name": "testcompany",
+        "purchase_type": "100",
+        "remark": "备注test"
+    },
+}
+# 6.Output
+{"code":"2000","message":"操作成功","data":"OK","success":true}

@@ -1,0 +1,106 @@
+# 自定义收银台页面展示
+自定义页面模块展示
+场景：作为商户我想配置收银台内容模块展示与否
+方案：
+语言——A
+商户信息——B
+订单信息——C
+Billing信息——D
+以上4个模块信息支持通过additional_data.page_config_v2来配置是否展示，具体示例：
+
+additional_data.page_config_v2
+PC	img
+H5	img
+传参规则	additional_data.page_config_v2:”语言_商户信息_订单信息_Billing信息” ， 需要展示的模块传入1，不需要展示传入0，各模块间以下划线链接
+// 例如：展示语言、商户信息、订单信息，不展示Billing信息
+additional_data.page_config_v2:"1_1_1_0"
+
+# 自定义语言
+默认是浏览器语言，支持英文，西班牙语言，法语等12种语言，没有匹配的语言时显示英文。通过页面主动切换语言后，延用用户选择的语言。若想固定显示某种语言可在url中配置 lang
+参数	说明
+lang	展示的语言
+lang对应的传参：
+
+lang传参	语言
+en-US	English
+es-ES	español
+fr-FR	Français
+zh-CN	中文
+de-DE	Deutsch
+pt-PT	português
+ar	العربية
+ru-RU	Русский
+ja-JP	日本語
+ko-KR	한국어
+vi-VN	Tiếng Việt
+it-IT	Italiano
+以上配置，在iframe内嵌收银台的场景适用，需拼接到url中使用。
+// 例如展示英文
+&lang=en-US
+
+
+# 自定义提交按钮
+在iframe的src链接中添加custom_submission=1参数，隐藏按钮
+通过postMessage向Flyway收银台发送{ type: ‘customSubmission’ }消息，触发表单提交
+监听提交结果，进行定制化处理
+<!-- 1.在iframe的src链接中添加custom_submission=1参数，隐藏按钮 -->
+<iframe id="iframeID1" frameborder="0" width="600px" height="500px" style="display: block; margin: 0 auto;"
+src="https://test.inflyway.com/cp-cashier/home?id=e1394545188b41bfb22ae8cb86d05f51&invoice_id=TN1814208462643052546&shipping=0&source=S001&ismobile=1&custom_submission=1"></iframe>
+
+<div style="margin-top: 30px;text-align: center;">
+  <button id="customSubmitBtn">自定义提交按钮</button>
+</div>
+
+
+<script>
+window.onload = function() {
+  document.getElementById('customSubmitBtn').addEventListener('click', function() {
+    // 2.通过postMessage向Flyway收银台发送{ type: 'customSubmission' }消息，触发表单提交
+    var iframe1 = document.getElementById('iframeID1');
+    iframe1.contentWindow.postMessage({ type: 'customSubmission' }, '*');
+  })
+
+  // 3. 监听提交结果，进行定制化处理
+  const onMsg = event => {
+    if (!event.data) return;
+    const fn = ({
+      customSubmissionValidated: function() {
+        console.log('表单校验通过');
+      },
+      customSubmissionValidateError: function() {
+        console.log('表单校验不通过', event.data.fields);
+      },
+      customSubmissionPayError: function() {
+        console.log('支付异常');
+      },
+      customSubmissionPaySuccess: function() {
+        console.log('支付已提交');
+      }
+    })[event.data.type];
+    fn && fn();
+  }
+
+  window.removeEventListener('message', onMsg);
+  window.addEventListener('message', onMsg, false);
+}
+</script>
+
+# 修改背景色
+参数	说明
+bg	设置背景色。比如设置白色bg=fff,粉色bg=ffd8e7。注意，值不带#
+配置需拼接到url中使用。
+
+&bg=fff
+
+# 隐藏头部和尾部
+参数	说明
+hide_top	隐藏头部高度，需配合page_config_v2实现头部隐藏效果
+hide_footer	隐藏尾部
+以上两个配置，在iframe内嵌收银台的场景适用，需拼接到url中使用。
+
+&hide_top=1&hide_footer=1
+3DS验证页面打开形式
+3DS验证页面默认在当前页面打开（如果是Iframe），若需要在新标签页打开3DS认证页面，可以在创建支付单时传入additional_data.open_3ds_type:"1"实现
+
+// 示例
+additional_data.open_3ds_type:"1"

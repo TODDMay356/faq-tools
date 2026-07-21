@@ -1,0 +1,95 @@
+
+# 付款人看到的账单上显示消费名称是什么？
+付款人账单上显示的是默认名称，若希望显示您交易网站的名称，请与您的客户经理联系。
+
+# 支持哪些交易币种和结算币种？
+币种对应国家	交易币种	结算币种	备注
+欧洲	EUR	EUR	本币结算
+美国	USD	USD	本币结算
+英国	GBP	GBP	本币结算
+阿拉伯联合酋长国	AED	USD	
+澳大利亚	AUD	USD	
+加拿大	CAD	CAD	本币结算
+中国	CNY	USD	
+哥伦比亚	COP	USD	
+捷克	CZK	USD	
+多米尼加共和国	DOP	USD	
+香港	HKD	USD	
+印尼	IDR	USD	
+以色列	ILS	USD	
+印度	INR	USD	
+日本	JPY	JPY	本币结算
+韩国	KRW	USD	
+墨西哥	MXN	USD	
+马来西亚	MYR	USD	
+阿曼	OMR	USD	
+秘鲁	PEN	USD	
+菲律宾	PHP	USD	
+波兰	PLN	USD	
+罗马尼亚	RON	USD	
+瑞典	SEK	USD	
+新加坡	SGD	USD	
+泰国	THB	USD	
+土耳其	TRY	USD	
+台湾	TWD	USD	
+南非	ZAR	USD	
+巴林	BHD	USD	
+埃及	EGP	USD	
+科威特	KWD	USD	
+卡塔尔	QAR	USD	
+沙特阿拉伯	SAR	USD
+
+
+# 支持哪些支付方式？
+支付方式	支持付款人国家	付款人可支付币种	结算币种	开户银行	支持退款	支持拒付	结算周期
+Visa	全球	全币种	USD/EUR/GBP/CAD/JPY	N/A	√	√	联系客户经理了解
+MasterCard	全球	全币种	USD/EUR/GBP/CAD/JPY	N/A	√	√	联系客户经理了解
+American Express	全球	USD/EUR/GBP/BRL/MXN	USD/EUR/GBP	N/A	√	√	每周结算一次
+Discover	全球	USD/EUR/GBP	USD/EUR/GBP	N/A	√	√	每日结算
+Diners Club	全球	USD/EUR/GBP	USD/EUR/GBP	N/A	√	√	每日结算
+Bancontact	比利时	EUR	EUR	N/A	√	×	每周结算一次
+ELO	巴西/巴拉圭	BRL/USD	USD	N/A	√	√	每周结算一次
+HIPERCARD	巴西	BRL/USD	USD	N/A	√	√	每周结算一次
+Blik	波兰	PLN	EUR	N/A	√	√	每周结算一次
+PRZELEWY24	波兰	PLN/EUR	EUR	N/A	√	×	每周结算一次
+EPS	奥地利	EUR	EUR	N/A	√	×	每周结算一次
+Giropay	德国	EUR	EUR	N/A	√	×	每周结算一次
+Multibanco	葡萄牙	EUR	EUR	N/A	√	×	每周结算一次
+Satispay	意大利/德国/法国/卢森堡/秘鲁	EUR	EUR	N/A	√	×	每周结算一次
+PIX	巴西	BRL/USD	USD	N/A	√	×	每周结算一次
+Payconiq	比利时/卢森堡	EUR	EUR	N/A	√	×	每周结算一次
+OXXO	墨西哥	MXN/USD	USD	N/A	√	×	每周结算一次
+boleto	巴西	BRL/USD	USD	N/A	√	×	每周结算一次
+SWIFT转账	全球	AED/AUD/CAD/CHF/CNH/CZK/DKK/EUR/GBP/HKD/HUF/ILS/JPY/MXN/NOK/NZD/PLN/RON/SAR/SEK/SGD/TRY/USD/ZAR	AUD/CAD/CHF/CNH/DKK/EUR/GBP/HKD/JPY/NOK/NZD/SEK/SGD/USD/	DBS/Banking Circle	×	×	资金到账后实时通知
+INTRADAG转账	丹麦	DKK	DKK	Banking Circle	×	×	资金到账后实时通知
+SEPA转账	欧盟	EUR	EUR	Banking Circle	×	×	资金到账后实时通知
+BACS/CHATS/FPS转账	英国	GBP	GBP	Banking Circle	×	×	资金到账后实时通知
+NAPAS转账	越南	VND	USD	VIETNAM MARITIME COMMERCIAL JOINT STOCK BANK	×	×	资金到账后实时通知
+
+# 支持哪些国家的卡？
+全球，只要卡片上有Visa或者Mastercard的Logo，即可进行支付。
+
+
+# 生产环境接口返回403
+1.请求头添加user-agent
+2.保证请求头没有携带local
+3.接口请求太频繁被拦截。请控制接口请求频率。
+
+# 其他对接事项
+Q:Authentication failed merchant is null
+A:确认请求头Authorization是否传值，传值是否跟文档要求一致。
+
+Q:No access 或者响应 403
+A: 本地以localhost方式启动站点，导致http_refer取到的值为localhost。会校验来源域名。
+
+Q:No payment method
+A: 1.notify_url、return_url与申请时填写的域名不一致，要保持notify_url与备案域名一致。
+   2. 币种、国家不支持，测试环境建议使用USD币种
+
+Q: 支付时提示网址未备案或者The website is not valid, please contact the payment service provide
+A: http_refer值跟测试环境申请MID时填写的域名不一致，要保持一致。跳转收银台地址来源域名必须备案。
+
+Q:签名问题,签名不对，签名校验失败
+A: 1.签名时的参数必须保证与接口上送时一致，尤其PHP需注意。
+   2.创建订单、退款，金额保留两位小数。
+   3.webhook验签金额为4位小数

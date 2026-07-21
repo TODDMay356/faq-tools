@@ -1,0 +1,70 @@
+
+# 1.支付结果查询介绍
+商城系统查询支付订单信息及支付状态
+
+# 2.基本信息
+名称	内容
+生产接口地址	https://payapi.inflyway.com/paycenter/api/order/payment/query
+测试接口地址	https://test.inflyway.com/paycenter/api/order/payment/query
+类型	JSON
+METHOD	POST
+
+# 3.参数
+3.1 Header
+参数名	是否必须	说明	示例
+Content-Type	是	指定参数类型	application/json
+Authorization	是	Basic xxxx	商户认证 merchant_id加secret_key，中间逗号:分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供）
+user-agent	是	用户支付请求中请求头user-agent	必传
+3.2 Body
+字段名	数据类型	是否必传	说明
+merchant_id	字符串	是	商户ID
+order_no	字符串	否	订单号
+payment_order_id	字符串	否	支付单ID,创建支付单接口返回的payment_order_id
+备注：订单号和支付订单ID，两个选传一个
+
+# 4.响应
+字段名	数据类型	是否必传	是否参与hash签名	说明
+payment_order_id	字符串	是	是	支付单ID
+status	字符串	是	是	支付状态
+merchant_id	字符串	是	是	商户编号
+invoice_id	字符串	是	是	交易号, 商户传入，必须唯一
+order_no	字符串	是	是	订单编号，商户传入
+currency	字符串	是	是	币种
+amount	字符串	是	是	金额 （hash验签转换四位小数）
+hash	字符串	是	否	签名
+failure_reason	字符串	是	否	失败原因
+payment_time	数字	是	否	支付时间（毫秒）
+5.Example
+{"merchant_id":"M200010000000817","order_no":"ldh100940"}
+6.Output
+{
+    "code": "2000",
+    "message": "操作成功",
+    "data": {
+        "merchant_id": "M200010000000817",
+        "invoice_id": "ldh100940",
+        "order_no": "ldh100940",
+        "currency": "USD",
+        "amount": 600.0000,
+        "status": "01",
+        "payment_order_id": "eac10e1863ee465cb0642106decd0187",
+        "hash": "D2A7F6F4A8546A5ECFD66A7572CBC4897D2F612CE6A543B6B643E618131AB2BD",
+        "payment_time": 1704420993000,
+        "failure_reason": ""
+    },
+    "success": true
+}
+
+# 支付结果状态
+支付结果状态码说明
+状态码	说明
+00	待支付
+01	已支付
+02	部分退款
+03	全部退款
+04	支付单已失效
+05	支付失败
+06	支付处理中
+07	已拒付
+08	部分退款有拒付
+09	全额退款有拒付

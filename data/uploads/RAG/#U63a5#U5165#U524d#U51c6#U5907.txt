@@ -1,0 +1,207 @@
+# 接入前准备
+1.获取商户ID（merchant_id）和商户秘钥（merchant_key）信息
+测试环境请填写信息申请表https://mx6mxeu5rn.feishu.cn/share/base/form/shrcnKFPlqlrKlqFtHqCaTqvdWf，申请审核通过后，将发送测试环境的商户id和密钥到填写的邮箱。
+生产环境请联系您的客户经理获取。
+
+# 2.接口签名
+2.1 商户创建支付单&支付API请求参数中 hash 字段的签名方法
+商户提交支付请求时, 对以下字段进行签名校验：
+
+商户ID(merchant_id)
+
+交易号(invoice_id)
+
+币种(currency)
+
+金额(amount)
+
+签名方法如下:
+
+使用 map 键值对组织需要提交的参数
+
+按键升序排列值
+
+将值合成一串,排除空值
+
+将商户密钥放在值串的最前面
+
+签名算法使用 sha256(SHA-256)算法,对最终的值串进行签名
+
+签名方法参考—JAVA版本
+
+import java.security.MessageDigest; 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List; import java.util.Map;
+public class DigestUtil {
+    /**
+     * 签名方法
+     * @param values 需要进行签名的参数 Map 
+     * @param key 商户秘钥,由 CamelPay颁发
+     * @return
+     */
+    public static String hash(Map<String, String> values, String key) {
+     List<String> fieldNames = new ArrayList<String>(values.keySet()); 
+     Collections.sort(fieldNames);
+        StringBuffer buf = new StringBuffer();
+        buf.append(key);
+        for (Iterator<String> itr = fieldNames.iterator(); itr.hasNext();) {
+            String fieldName = (String) itr.next();
+            String fieldValue = (String) values.get(fieldName);
+            if (null != fieldValue && !fieldValue.trim().equals(""))
+                buf.append(fieldValue);
+        }
+        return hash(buf.toString(), "SHA-256"); }
+    private static String hash(String s, String algorithm) {
+        MessageDigest md5 = null; byte ba[] = (byte[]) null; try {
+            md5 = MessageDigest.getInstance(algorithm);
+            ba = md5.digest(s.getBytes("utf-8")); } catch (Exception exception) {
+        }
+        return hex(ba);
+    }
+    private static String hex(byte input[]) {
+        StringBuffer sb = new StringBuffer(input.length * 2);
+        for (int i = 0; i < input.length; i++) { 
+        sb.append(HEX_TABLE_UPPER[input[i] >> 4 & 0xf]); 
+        sb.append(HEX_TABLE_UPPER[input[i] & 0xf]);
+        }
+        return sb.toString(); }
+    private static final char[] HEX_TABLE_UPPER=
+     { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+}
+
+# 接口签名方法参考—PHP版本
+
+// 生成验签所需hash值  
+    public function sign($data, $api\_key, $callback\_keys)  
+    {  
+        $hash\_src \= '';  
+        $hash\_key \= array('amount', 'currency', 'invoice\_id', 'merchant\_id');  
+​  
+        if (!empty($callback\_keys)) {  
+            $hash\_key \= array\_merge($hash\_key, $callback\_keys);  
+        }  
+​  
+        // 按 key 名进行顺序排序  
+        sort($hash\_key);  
+        foreach ($hash\_key as $key) {  
+            //! 这里支付那边给了float类型，但是生成hash的时候需要string  
+            // 此处float——>string且保留2位小数  
+            if (is\_float($data\[$key\])) {  
+                $hash\_src .\= number\_format($data\[$key\], 2, '.', '');  
+            } else {  
+                $hash\_src .\= $data\[$key\];  
+            }  
+        }  
+        // 密钥放最前面  
+        $hash\_src \=  $api\_key . $hash\_src;  
+        // sha256 算法  
+        $hash \= hash('sha256', $hash\_src);  
+​  
+        return strtoupper($hash);  
+    }
+# 2.2 商户接收支付API和“支付结果通知”、“支付完成页面回调”参数中 hash 字段的签名方法
+商户接收支付响应时，支付系统会对商户提交支付请求后，返回给商户的 “返回参数”的字段进行签名， 签名字段列表：
+
+amount （通知金额字段为四位小数）
+
+currency
+
+invoice_id
+
+merchant_id
+
+payment_order_id
+
+status
+
+商户需要对返回的结果进行验证签名保证结果是不受篡改的。
+
+签名方法如下:
+
+使用 map 键值对组织需要提交的参数
+
+按键升序排列值
+
+将值合成一串，排除空值
+
+将商户密钥放在值串的最前面
+
+签名算法使用 sha256(SHA-256)算法,对最终的值串进行签名
+
+签名方法参考—JAVA版本
+
+import java.security.MessageDigest;   
+import java.util.ArrayList;  
+import java.util.Collections;  
+import java.util.Iterator;  
+import java.util.List; import java.util.Map;  
+public class DigestUtil {  
+    /\*\*  
+     \* 签名方法  
+     \* @param values 需要进行签名的参数 Map   
+     \* @param key 商户秘钥,由 CamelPay颁发  
+     \* @return  
+     \*/  
+    public static String hash(Map<String, String\> values, String key) {  
+     List<String\> fieldNames \= new ArrayList<String\>(values.keySet());   
+     Collections.sort(fieldNames);  
+        StringBuffer buf \= new StringBuffer();  
+        buf.append(key);  
+        for (Iterator<String\> itr \= fieldNames.iterator(); itr.hasNext();) {  
+            String fieldName \= (String) itr.next();  
+            String fieldValue \= (String) values.get(fieldName);  
+            if (null != fieldValue && !fieldValue.trim().equals(""))  
+                buf.append(fieldValue);  
+        }  
+        return hash(buf.toString(), "SHA-256"); }  
+    private static String hash(String s, String algorithm) {  
+        MessageDigest md5 \= null; byte ba\[\] \= (byte\[\]) null; try {  
+            md5 \= MessageDigest.getInstance(algorithm);  
+            ba \= md5.digest(s.getBytes("utf-8")); } catch (Exception exception) {  
+        }  
+        return hex(ba);  
+    }  
+    private static String hex(byte input\[\]) {  
+        StringBuffer sb \= new StringBuffer(input.length \* 2);  
+        for (int i \= 0; i < input.length; i++) {   
+        sb.append(HEX\_TABLE\_UPPER\[input\[i\] \>> 4 & 0xf\]);   
+        sb.append(HEX\_TABLE\_UPPER\[input\[i\] & 0xf\]);  
+        }  
+        return sb.toString(); }  
+    private static final char\[\] HEX\_TABLE\_UPPER\=  
+     { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};  
+}
+
+
+# 通知回调签名方法参考—PHP版本
+
+// 生成验签所需hash值  
+    public function sign($data, $api\_key, $callback\_keys)  
+    {  
+        $hash\_src \= '';  
+        $hash\_key \= array('amount', 'currency', 'invoice\_id', 'merchant\_id', 'payment\_order\_id', 'status');  
+​  
+        if (!empty($callback\_keys)) {  
+            $hash\_key \= array\_merge($hash\_key, $callback\_keys);  
+        }  
+​  
+        // 按 key 名进行顺序排序  
+        sort($hash\_key);  
+        foreach ($hash\_key as $key) {  
+            //! 这里支付那边给了float类型，但是生成hash的时候需要string  
+            // 此处float——>string且保留2位小数  
+            if (is\_float($data\[$key\])) {  
+                $hash\_src .\= number\_format($data\[$key\], 4, '.', '');  
+            } else {  
+                $hash\_src .\= $data\[$key\];  
+            }  
+        }  
+        // 密钥放最前面  
+        $hash\_src \=  $api\_key . $hash\_src;  
+        // sha256 算法  
+        $hash \= hash('sha256', $hash\_src);  
+​  
+        return strtoupper($hash);  
+    }

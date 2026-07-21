@@ -1,0 +1,71 @@
+
+# 1.退款结果查询介绍
+商城系统退款订单状态查询
+
+# 2.基本信息
+名称	内容
+生产接口地址	https://payapi.inflyway.com/paycenter/api/refund/query
+测试接口地址	https://test.inflyway.com/paycenter/api/refund/query
+类型	JSON
+METHOD	POST
+
+# 3.参数
+3.1 Header
+参数名	是否必须	说明	示例
+Content-Type	是	指定参数类型	application/json
+Authorization	是	Basic xxxx	商户认证 merchant_id加secret_key，中间逗号:分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供）
+user-agent	是	用户支付请求中请求头user-agent	必传
+3.2 Body
+字段名	数据类型	是否必传	说明
+merchant_id	字符串	是	商户ID
+refund_request_id	字符串	否	退款请求ID
+invoice_id	字符串	否	支付单业务单号
+refund_order_id	字符串	否	退款订单号
+备注：退款请求ID、支付单业务单号和退款订单号三选一
+
+# 4.响应
+字段名	数据类型	是否必传	说明
+merchant_id	字符串	是	商户编号
+invoice_id	字符串	是	支付单业务单号
+refund_order_id	字符串	是	退款单号
+merchant_request_id	字符串	是	退款请求ID
+amount	字符串	是	金额
+currency	字符串	是	币种
+status	字符串	是	状态：00-退款处理中，01-退款成功，02-退款失败
+pay_order_id	字符串	是	支付单号
+arn	字符串	是	退款arn
+failure_reason	字符串	是	失败原因
+
+# 5.Example
+{
+    "merchant_id": "M200010000001195",
+    "refund_request_id": "SzgR20250416001",
+    "invoice_id": "",
+    "refund_order_id": ""
+}
+6.Output
+{
+  "reqNo": null,
+  "code": "2000",
+  "message": "操作成功",
+  "data": [
+    {
+      "merchant_id": "M200010000001195",
+      "refund_order_id": "RO20250416135855759011177",
+      "merchant_request_id": "SzgR20250416001",
+      "invoice_id": "szg2025041601",
+      "amount": 500.0000,
+      "currency": "USD",
+      "remark": null,
+      "status": "01",
+      "failureMsg": "",
+      "fee_currency": "USD",
+      "fee_amount": 500.0000,
+      "pay_order_id": "PO20250416135245819168087",
+      "arn": "72700495106011229072669"
+    }
+  ],
+  "success": true,
+  "failed": false,
+  "processing": false
+}

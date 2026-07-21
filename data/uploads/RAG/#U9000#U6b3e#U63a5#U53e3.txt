@@ -1,0 +1,63 @@
+# 1.退款接口介绍
+商城系统通过接口提交退款给飞来汇支付系统。测试环境对接时需先联系FlyPay技术人员，提供invoice_id。
+
+# 2.基本信息
+名称	内容
+生产接口地址	https://payapi.inflyway.com/paycenter/api/refund/submit
+测试接口地址	https://test.inflyway.com/paycenter/api/refund/submit
+类型	JSON
+METHOD	POST
+
+#3.参数
+3.1 Header
+参数名	是否必须	说明	示例
+Content-Type	是	指定参数类型	application/json
+Authorization	是	Basic xxxx	商户认证 merchant_id加secret_key，中间逗号:分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供）
+user-agent	是	用户支付请求中请求头user-agent	必传
+3.2 Body
+字段名	数据类型	是否必传	说明
+merchant_id	字符串	是	商户ID
+request_id	字符串	是	退款请求编号
+invoice_id	字符串	是	原始支付请求编号
+refund_amount	字符串	是	退款金额
+currency	字符串	是	币种
+notify_url	字符串	否	退款结果通知地址 （退款通知参数见webhook接入）
+hash	字符串	是	hash签名（currency + invoice_id + merchant_id + refund_amount）
+备注：
+
+# 4.响应
+字段名	数据类型	是否必传	说明
+refund_order_id	字符串	是	支付单ID
+status	字符串	是	状态 00 处理中 01 成功 02 失败
+hash	字符串	是	签名
+failure_reason	字符串	是	失败原因
+failure_code	字符串	是	失败代码
+pay_flow_id	字符串	是	支付编号
+
+# 5.Example
+{
+    "request_id": "372f4f958bb948d7a21e29ce37bf12ca",
+    "merchant_id": "M200010000001203",
+    "invoice_id": "1775111029315997698",
+    "refund_amount": 10.25,
+    "currency": "USD",
+    "notify_url": "https://test.inflyway.com/refund/notify"
+    "hash": "9F241F3B5A5A3621E2031FCB9ADBE9310A63D0375A9DB71F159FA20E7B8C049D"
+}
+
+# 6.Output
+{
+    "reqNo": null,
+    "code": "2000",
+    "message": "操作成功",
+    "data": {
+        "refund_order_id": "RO20240321110549490000125",
+        "status": "01",
+        "failure_reason": "",
+        "failure_code": null,
+        "pay_flow_id": "PF20240321105915428000849"
+    },
+    "failed": false,
+    "processing": false,
+    "success": true
+}

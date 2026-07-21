@@ -1,0 +1,144 @@
+
+# 1.拒付单分页查询接口介绍
+商城系统拒付单分页查询
+
+# 2.基本信息
+名称	内容
+生产接口地址	https://payapi.inflyway.com/paycenter/api/chargeback/page/query
+测试接口地址	https://test.inflyway.com/paycenter/api/chargeback/page/query
+类型	JSON
+METHOD	POST
+
+# 3.参数
+3.1 Header
+参数名	是否必须	说明	示例
+Content-Type	是	指定参数类型	application/json
+Authorization	是	Basic xxxx	商户认证 merchant_id加secret_key，中间逗号:分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供）
+user-agent	是	用户支付请求中请求头user-agent	必传
+3.2 Body
+字段名	数据类型	是否必传	说明
+page_num	数字类型	是	页码
+page_size	数字类型	是	页条数（最大50）
+invoice_id	字符串	否	支付单业务单号
+chargeback_order_id	字符串	否	拒付单ID
+create_time_begin	字符串	否	开始时间，时间格式：2025-06-25 00:00:00
+create_time_end	字符串	否	截止时间，时间格式：2025-06-25 00:00:00
+# 4.响应
+字段名	数据类型	是否必传	是否参与hash	说明
+code	字符串	是	是	返回码 2000-成功，其他-失败
+message	字符串	是	否	返回信息
+page_num	数字	是	是	页码
+page_size	数字	是	是	页大小
+total_count	数字	是	是	总条数
+merchant_id	字符串	是	是	商户ID
+hash	字符串	是	否	验签hash
+data	数组	是	否	数据
+data.merchant_id	字符串	是	否	商户ID
+data.merchant_name	字符串	是	否	商户名称
+data.pay_order_id	字符串	是	否	支付单ID
+data.chargeback_order_id	字符串	是	否	拒付单ID
+data.order_no	字符串	是	否	业务单号
+data.invoice_id	字符串	是	否	支付业务单号
+data.create_time	字符串	是	否	创建时间
+data.trade_amount	数字	是	否	支付金额
+data.trade_currency	字符串	是	否	支付币种
+data.chargeback_amount	数字	是	否	拒付金额
+data.chargeback_currency	字符串	是	否	拒付币种
+data.appeal_succ_return_amount	数字	是	否	预仲裁成功返还金额
+data.appeal_succ_return_currency	字符串	是	否	预仲裁成功返还币种
+data.appeal_failed_deduct_amount	数字	是	否	预仲裁失败扣除金额
+data.appeal_failed_deduct_currency	字符串	是	否	预仲裁失败扣除币种
+data.cancel_return_amount	数字	是	否	拒付撤销返还金额
+data.cancel_return_currency	字符串	是	否	拒付撤销返还币种
+data.reason_code	数字	否	否	拒付原因编码
+data.reason_desc	字符串	否	否	拒付原因描述
+data.chargeback_status	字符串	否	否	拒付状态 参考拒付状态说明
+data.chargeback_status_desc	字符串	否	否	拒付状态描述
+data.arn	字符串	否	否	拒付arn
+
+#5.Example
+{
+  "page_num": 1,
+  "page_size": 5,
+  "chargeback_order_id": "",
+  "invoice_id": "",
+  "create_time_begin": "2025-03-01 00:00:00",
+  "create_time_end": "2025-05-20 23:59:59"
+}
+
+#6.Output
+{
+  "code": "2000",
+  "message": "操作成功",
+  "data": [
+    {
+      "merchant_id": "M200010000001195",
+      "merchant_name": "陈瑛",
+      "pay_order_id": "PO20250507164315399184247",
+      "chargeback_order_id": "CBO20250507164635263003677",
+      "order_no": "1920036691595907073",
+      "invoice_id": "1920036691595907073",
+      "trade_amount": 400.0000,
+      "trade_currency": "USD",
+      "chargeback_amount": 300.0000,
+      "chargeback_currency": "USD",
+      "chargeback_status": "01",
+      "chargeback_status_desc": "商户同意拒付",
+      "reason_code": "退货，不要了",
+      "reason_desc": "Other Fraud",
+      "create_time": "2025-05-07 16:46:35",
+      "arn": "123",
+      "appeal_succ_return_amount": null,
+      "appeal_succ_return_currency": null,
+      "appeal_failed_deduct_amount": null,
+      "appeal_failed_deduct_currency": null,
+      "cancel_return_amount": null,
+      "cancel_return_currency": null
+    },
+    {
+      "merchant_id": "M200010000001195",
+      "merchant_name": "陈瑛",
+      "pay_order_id": "PO20250507163024719183837",
+      "chargeback_order_id": "CBO20250507163454502003667",
+      "order_no": "1920033459456856065",
+      "invoice_id": "1920033459456856065",
+      "trade_amount": 200.0000,
+      "trade_currency": "USD",
+      "chargeback_amount": 200.0000,
+      "chargeback_currency": "USD",
+      "chargeback_status": "01",
+      "chargeback_status_desc": "商户同意拒付",
+      "reason_code": "退货，不要了",
+      "reason_desc": "Other Fraud",
+      "create_time": "2025-05-07 16:34:54",
+      "arn": "123",
+      "appeal_succ_return_amount": null,
+      "appeal_succ_return_currency": null,
+      "appeal_failed_deduct_amount": null,
+      "appeal_failed_deduct_currency": null,
+      "cancel_return_amount": null,
+      "cancel_return_currency": null
+    }
+  ],
+  "page_num": 1,
+  "page_size": 2,
+  "total_count": 50,
+  "merchant_id": "M200010000001195",
+  "hash": "99E523082066371CA5C5841DCC18BA0EC92949D06D2D30FCEEFD89FE40F0B755",
+  "success": true
+}
+
+
+# 拒付订单状态
+拒付状态码说明
+状态码	状态描述	说明
+00	可申诉	付款方发起拒付
+01	不可申诉	商户同意拒付
+02	申诉提交中	预仲裁发起处理中
+03	卡组仲裁中	预仲裁发起成功
+04	申诉提交失败	预仲裁发起失败
+05	申诉成功	预仲裁胜诉
+06	申诉失败	预仲裁败诉
+09	已撤销-买家撤销	买家取消拒付
+10	已撤销-网关撤销	卖家已退款导致网关取消拒付
+11	RDR快速解决	RDR快速解决

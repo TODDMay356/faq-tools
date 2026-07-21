@@ -1,0 +1,3 @@
+wxpy
+requests
+python-dotenv

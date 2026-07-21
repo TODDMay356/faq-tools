@@ -1,0 +1,84 @@
+# 支付完成页面回调
+接口描述：将支付结果回传到业务系统提供的回调地址，业务系统接收到回传的支付结果后，进行验签和订单状态处理，同时显示商城的支付结果页面。
+
+提供方：CamelPay
+
+接口地址：通过创建支付单接口传进来的回调地址（return_url参数）
+
+类型：http form
+
+METHOD: GET
+
+备注：
+
+请求参数
+
+字段名 数据类型 说明 示例
+merchant_id 字符串 商户ID
+
+order_no 字符串 订单号
+
+payment_order_id 字符串 支付单ID
+
+invoice_id 字符串 业务系统流水号
+
+currency 字符串 币种
+
+amount 字符串 金额
+
+status 字符串 支付状态:01支付成功;02支付失败;00 支付处理中
+
+failure_reason 字符串 失败原因
+
+pay_method_id 字符串 支付方式 P00001 visa&mastercard
+hash 字符串 签名hash
+
+
+#  支付页面回调和支付通知参数中 hash 字段的签名方法
+商户接收”支付结果通知”、”支付完成（回调）页面 “参数中 hash 字段的签名方法
+商户接收支付响应时，支付系统会对商户提交支付请求后，返回给商户的 “返回参数”的字段进行签名， 签名字段列表：amount，currency，invoice_id，merchant_id，payment_order_id，status 。商户需要对返回的结果进行验证签名保证结果是不受篡改的。
+
+签名方法如下:
+
+使用 map 键值对组织需要提交的参数。
+
+按键升序排列值。
+
+将值合成一串,排除空值。
+
+将商户密钥放在值串的最前面。
+
+签名算法使用 sha256(SHA-256)算法,对最终的值串进行签名
+
+工具类代码JAVA同上。
+
+签名代码PHP如下：
+
+// 生成验签所需hash值
+    public function sign($data, $api_key, $callback_keys)
+    {
+        $hash_src = '';
+        $hash_key = array('amount', 'currency', 'invoice_id', 'merchant_id', 'payment_order_id', 'status');
+
+        if (!empty($callback_keys)) {
+            $hash_key = array_merge($hash_key, $callback_keys);
+        }
+
+        // 按 key 名进行顺序排序
+        sort($hash_key);
+        foreach ($hash_key as $key) {
+            //! 这里支付那边给了float类型，但是生成hash的时候需要string
+            // 此处float——>string且保留2位小数
+            if (is_float($data[$key])) {
+                $hash_src .= number_format($data[$key], 2, '.', '');
+            } else {
+                $hash_src .= $data[$key];
+            }
+        }
+        // 密钥放最前面
+        $hash_src =  $api_key . $hash_src;
+        // sha256 算法
+        $hash = hash('sha256', $hash_src);
+
+        return strtoupper($hash);
+    }

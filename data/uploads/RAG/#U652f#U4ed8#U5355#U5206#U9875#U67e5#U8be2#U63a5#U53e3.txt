@@ -1,0 +1,126 @@
+
+# 1.支付单分页查询接口介绍
+商城系统支付订单分页查询
+
+# 2.基本信息
+名称	内容
+生产接口地址	https://payapi.inflyway.com/paycenter/api/order/payment/page/query
+测试接口地址	https://test.inflyway.com/paycenter/api/order/payment/page/query
+类型	JSON
+METHOD	POST
+
+# 3.参数
+3.1 Header
+参数名	是否必须	说明	示例
+Content-Type	是	指定参数类型	application/json
+Authorization	是	Basic xxxx	商户认证 merchant_id加secret_key，中间逗号:分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供）
+user-agent	是	用户支付请求中请求头user-agent	必传
+3.2 Body
+字段名	数据类型	是否必传	说明
+page_num	数字类型	是	页码
+page_size	数字类型	是	页条数（最大50）
+invoice_id	字符串	否	支付单业务单号
+pay_order_id	字符串	否	支付单号
+create_time_begin	字符串	否	开始时间，时间格式：2025-06-25 00:00:00
+create_time_end	字符串	否	截止时间，时间格式：2025-06-25 00:00:00
+
+# 4.响应
+字段名	数据类型	是否必传	是否参与hash	说明
+code	字符串	是	是	返回码 2000-成功，其他-失败
+message	字符串	是	否	返回信息
+page_num	数字	是	是	页码
+page_size	数字	是	是	页大小
+total_count	数字	是	是	总条数
+merchant_id	字符串	是	是	商户ID
+hash	字符串	是	否	验签hash
+data	数组	是	否	数据
+data.merchant_id	字符串	是	否	商户ID
+data.merchant_name	字符串	是	否	商户名称
+data.pay_order_id	字符串	是	否	支付单ID
+data.order_no	字符串	是	否	业务单号
+data.invoice_id	字符串	是	否	支付业务单号
+data.create_time	字符串	是	否	创建时间
+data.pay_amount	数字	是	否	支付金额
+data.pay_currency	字符串	是	否	支付币种
+data.fee_amount	数字	否	否	手续费金额
+data.fee_currency	字符串	否	否	手续费币种
+data.settle_amount	字符串	否	否	结算金额
+data.settle_currency	字符串	否	否	结算币种
+data.settle_status	字符串	否	否	结算状态
+data.settle_status_desc	字符串	是	否	结算状态描述
+data.pay_status	字符串	是	否	支付单状态
+data.pay_status_desc	字符串	是	否	支付单状态描述
+data.pay_failure_msg	字符串	否	否	失败原因
+data.pay_time	字符串	否	否	支付完成时间
+data.arn	字符串	否	否	arn
+data.pay_method	字符串	否	否	支付方法
+data.is_3ds	字符串	否	否	是否3ds认证 0-无，1-有
+
+# 5.Example
+{
+  "page_num": 1,
+  "page_size": 5,
+  "invoice_id": "",
+  "create_time_begin": "2025-03-01 00:00:00",
+  "create_time_end": "2025-05-20 23:59:59"
+}
+
+# 6.Output
+{
+  "code": "2000",
+  "message": "操作成功",
+  "data": [
+    {
+      "merchant_id": "M200010000000148",
+      "merchant_name": "國際有限公司",
+      "pay_order_id": "PO20250626110730772253797",
+      "order_no": "szg2025062503",
+      "invoice_id": "szg2025062503",
+      "create_time": "2025-06-26 11:07:30",
+      "pay_amount": 1020.0000,
+      "pay_currency": "USD",
+      "fee_amount": "14.3400",
+      "fee_currency": "USD",
+      "settle_amount": "1020.0000",
+      "settle_currency": "USD",
+      "settle_status": "01",
+      "settle_status_desc": "已入账",
+      "pay_status": "01",
+      "pay_status_desc": "已支付",
+      "pay_failure_msg": "",
+      "pay_time": "2025-06-26 11:07:58",
+      "arn": "24871135177011439611876",
+      "pay_method": "VISA",
+      "is_3ds": "0"
+    },
+    {
+      "merchant_id": "M200010000000148",
+      "merchant_name": "國際有限公司",
+      "pay_order_id": "PO20250626110102318253787",
+      "order_no": "szg2025062502",
+      "invoice_id": "szg2025062502",
+      "create_time": "2025-06-26 11:01:02",
+      "pay_amount": 1020.0000,
+      "pay_currency": "USD",
+      "fee_amount": "14.3400",
+      "fee_currency": "USD",
+      "settle_amount": "1020.0000",
+      "settle_currency": "USD",
+      "settle_status": "01",
+      "settle_status_desc": "已入账",
+      "pay_status": "01",
+      "pay_status_desc": "已支付",
+      "pay_failure_msg": "",
+      "pay_time": "2025-06-26 11:02:32",
+      "arn": "24871135177011439611942",
+      "pay_method": "VISA",
+      "is_3ds": "0"
+    }
+  ],
+  "page_num": 1,
+  "page_size": 5,
+  "total_count": 2,
+  "merchant_id": "M200010000000148",
+  "hash": "E42486FD6ABC4B5B8168DEDA8EBA5A976D76B4674CEBA12F718C8A5CB0027108",
+  "success": true
+}

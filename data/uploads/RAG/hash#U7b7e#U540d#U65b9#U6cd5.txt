@@ -1,0 +1,55 @@
+# 创建支付单和支付完成hash签名方法
+商户”创建支付单”、”支付完成跳转链接”参数中 hash 字段的签名方法
+1、商户在请求创建支付单接口时需要根据指定的参数进行hash签名赋值到hash字段，我们会校验hash值来保证请求的安全性。
+2、在支付成功之后跳转到商户的return_url，我们也会对return_url中的字段进行签名hash字段。商户同样需要校验hash值来保证请求的安全性
+
+# 创建支付单签名字段
+签名字段列表：amount，currency，invoice_id，merchant_id。
+
+
+# return_url中hash签名字段
+签名字段列表：amount，currency，invoice_id，merchant_id，payment_order_id，status 。
+
+签名方法如下:
+使用 map 键值对组织需要提交的参数。
+
+按键升序排列值。
+
+将值合成一串,排除空值。
+
+将商户密钥放在值串的最前面。
+
+签名算法使用 sha256(SHA-256)算法,对最终的值串进行签名
+
+工具类代码JAVA同上。
+
+签名代码PHP如下：
+
+// 生成验签所需hash值
+    public function sign($data, $api_key, $callback_keys)
+    {
+        $hash_src = '';
+        $hash_key = array('amount', 'currency', 'invoice_id', 'merchant_id', 'payment_order_id', 'status');
+
+        if (!empty($callback_keys)) {
+            $hash_key = array_merge($hash_key, $callback_keys);
+        }
+
+        // 按 key 名进行顺序排序
+        sort($hash_key);
+        foreach ($hash_key as $key) {
+            //! 这里支付那边给了float类型，但是生成hash的时候需要string
+            // 此处float——>string且保留2位小数
+            if (is_float($data[$key])) {
+                $hash_src .= number_format($data[$key], 2, '.', '');
+            } else {
+                $hash_src .= $data[$key];
+            }
+        }
+        // 密钥放最前面
+        $hash_src =  $api_key . $hash_src;
+        // sha256 算法
+        $hash = hash('sha256', $hash_src);
+
+        return strtoupper($hash);
+    }

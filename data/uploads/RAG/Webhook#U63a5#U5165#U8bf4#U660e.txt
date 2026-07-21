@@ -1,0 +1,82 @@
+# Webhook接入说明
+说明：
+Webhook可以及时接收到订单的支付、退款状态、拒付，拒付预警等消息通知(拒付、拒付预警默认不通知，如需开启请联系BD开启)。
+备注： 商城系统接收到通知返回”OK”,飞来汇支付系统即不再通知。否则每隔6分钟发送一次，总共发送10次
+
+
+# Webhook url的设置方式
+通过客服进行配置
+在创建支付单时通过创建支付单接口的参数notify_url传递
+请求方式：POST
+请求头：Hash-Sign 用于校验响应值是否合法（hash值获取方式)
+支付状态通知
+请求体：
+参数名	类型	是否参数hash	说明
+type	字符串	否	业务类型：pay-支付;chargeback-拒付
+pay_order_id	字符串	否	支付单号
+payment_order_id	字符串	否	支付单UUID
+pay_method	字符串	否	支付方式（例如：VISA）
+pay_method_cate	字符串	否	支付方式分类（例如：CREDITCARD）
+trans_order_id	字符串	是	支付业务号
+merchant_id	字符串	是	商户ID
+invoice_id	字符串	是	业务单支付号
+currency	字符串	是	币种
+amount	数字	是	金额(四位小数)
+failure_reason	字符串	否	失败原因
+order_no	字符串	否	业务单号
+status	字符串	是	状态（详情）
+支付通知
+状态
+01-支付成功
+05-支付失败
+06-支付处理中
+支付请求示例
+{
+   "type": "pay",
+   "amount": 1020,
+   "status": "01",
+   "currency": "USD",
+   "order_no": "szg2025052210",
+   "invoice_id": "szg2025052210",
+   "pay_method": "VISA",
+   "merchant_id": "M200010000001195",
+   "pay_order_id": "PO20250522201704508202927",
+   "trans_order_id": "PO20250522201704508202927",
+   "pay_method_cate": "CREDITCARD",
+   "payment_order_id": "bcfafd9af2bd41c8b7e7b957f1d69a5a7"
+}
+
+# 退款通知 请求体：
+参数名	类型	是否参数hash	说明
+type	字符串	否	业务类型：refund-退款
+pay_order_id	字符串	否	支付单号
+payment_order_id	字符串	否	支付单UUID
+merchant_request_id	字符串	否	api退款接口request_id
+refund_type	字符串	否	退款类型：全额退款（all），部分退款（section）
+remark	字符串	否	备注
+trans_order_id	字符串	是	退款业务号
+merchant_id	字符串	是	商户ID
+invoice_id	字符串	是	业务单支付号
+currency	字符串	是	币种
+amount	数字	是	金额(四位小数)
+failure_reason	字符串	否	失败原因
+order_no	字符串	否	业务单号
+status	字符串	是	状态 ：00-退款处理中，01-退款成功，02-退款失败
+
+# 退款请求示例
+{
+   "type": "refund",
+   "amount": 73.9400,
+   "remark": "123123",
+   "status": "01",
+   "currency": "USD",
+   "order_no": "0334135",
+   "invoice_id": "0334135-756",
+   "merchant_id": "MT200010000002078",
+   "refund_type": "all",
+   "pay_order_id": "PO20250522192912958202817",
+   "failure_reason": "",
+   "trans_order_id": "RO20250522194344402013497",
+   "payment_order_id": "70d22a0d6cf04f6787737aa8acba79d87",
+   "merchant_request_id": "RORI20250522194344391000837"
+}

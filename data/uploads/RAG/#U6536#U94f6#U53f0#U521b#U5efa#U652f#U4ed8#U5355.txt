@@ -1,0 +1,164 @@
+[TOC]
+
+# 1.介绍
+商城创建支付单接口，返回FLYPAY支付单号和收银台地址，然后商城控制浏览器跳转到收银台【[**在线调用**](https://apifox.com/apidoc/shared-7ecf08ea-83a6-4af4-ab46-da551f37e4f2/api-137402108 "在线调用")】
+
+#2.基本信息
+|  名称 |  内容 |
+| ------------ | ------------ |
+|  生产接口地址 | https://payapi.inflyway.com/paycenter/api/order/payment/create  |
+|  测试接口地址 |  https://test.inflyway.com/paycenter/api/order/payment/create |
+|  类型 |  JSON |
+|  METHOD | POST  |
+
+
+#3.参数
+## 3.1 Header
+  
+| 参数名 | 是否必须 | 说明 | 示例 |
+| --- | --- | --- | --- |
+| Content-Type | 是 | 指定参数类型 | application/json |
+| Authorization | 是 | Basic xxxx | 商户认证 merchant_id加secret_key，中间**:**分割。经过base64编码，（商户号merchantId和商户秘钥secret_key请找技术支持提供） |
+| user-agent | 是 | 用户支付请求中请求头user-agent| 必传 |
+
+## 3.2 Body
+| 字段名 | 数据类型 | 是否必传 | 说明 |
+| --- | --- | --- | --- |
+| merchant_id | 字符串 | 是 | 商户编号 |
+| invoice_id | 字符串 | 是 | 交易号, 商户传入，必须唯一 （50位内，数字，字母，中划线）|
+| order_no | 字符串 | 是 | 订单编号，商户传入 （50位内，数字，字母，中划线），建议与invoice_id一致 |
+| currency | 字符串 | 是 | 币种 |
+| amount | 数字类型 | 是 | 金额 |
+| buyer_email | 字符串 | 是 | 买家邮件地址，接入 ae 必须传以作风控 |
+| return_url | 字符串 | 是 | 支付动作完成后返回到该 url，支付结果以 GET 方式发送 |
+| notify_url | 字符串 | 是 | 支付异步通知地址，参见“支付结果通知”，需与备案域名一致，特殊情况联系技术人员 |
+| website | 字符串 | 是 | 商户网址 |
+| remark | 字符串 | 否 | 订单相关信息 100字符内 |
+| hash | 字符串 | 是 | 对传入参数进行 hash 签名，签名算法见 **附录1** |
+| goods | 数组-对象 | 是 | 商品信息 |
+| goods.name | 字符串 | 是 | 商品名称 ***注：ApplePay必传*** |
+| goods.price | 数字类型 | 是 | 商品价格 ***注：ApplePay必传*** |
+| goods.desc | 字符串 | 是 | 商品描述 |
+| goods.url | 字符串 | 是 | 商品链接（500字符内） |
+| goods.item_num | 数字类型 | 是 | 商品数量 |
+| goods.unit | 字符串 | 是 | 商品单位 （20字符内） |
+| goods.category | 字符串 | 是 | 商品分类 (50字符内) |
+| goods.remark | 字符串 | 是 | 商品备注 |
+| shipping | 对象 | 是 | shipping信息**（[参考贸易类型]  货物贸易必传，服务贸易非必传）** |
+| shipping.first_name | 字符串 | 是 | shipping 名（长度不为0的非数字字符串） |
+| shipping.last_name | 字符串 | 是 | shipping 姓（长度不为0的非数字字符串） |
+| shipping.country | 字符串 | 是 | 买家货运国家，ISO代码 |
+| shipping.state | 字符串 | 是 | shipping 州省 |
+| shipping.city | 字符串 | 是 | shipping 城市 |
+| shipping.address_line | 字符串 | 是 | shipping 详细地址（长度不小于3位的非纯数字字符串） |
+| shipping.zipcode | 字符串 | 是 | shipping 邮政编码（2-16位数字字母组合） |
+| shipping.email | 字符串 | 是 | shipping emai |
+| shipping.phone | 字符串 | 是 | shipping phone（不包含特殊字符长度4-20位字符串） |
+| billing | 对象 | 是 | shipping信息**（[参考贸易类型] 货物贸易非必传，服务贸易必传（国家，邮编不可为空））** |
+| billing.first_name | 字符串 | 否 | billing 名 |
+| billing.last_name | 字符串 | 否 | billing 姓 |
+| billing.country | 字符串 | 是 | 账单国家，ISO代码 |
+| billing.state | 字符串 | 否 | billing 州省 |
+| billing.city | 字符串 | 否 | billing 城市 |
+| billing.address_line | 字符串 | 否 | billing 详细地址 |
+| billing.zipcode | 字符串 | 否 | billing 邮政编码（2-16位数字字母组合） |
+| billing.email | 字符串 | 否 | billing emai |
+| billing.phone | 字符串 | 否 | billing phone |
+| software_info | 对象 | 否 | 软件服务信息 |
+| software_info.app_store | 字符串 | 是 | 应用市场，如App Store、安卓等，100个字符以内 |
+| software_info.category | 字符串 | 是 | 软件类别code，枚举值(含义)：01(软件) 02(游戏)|
+| software_info.license_no | 字符串 | 否 | 软件标志号，100个字符以内 |
+| software_info.name | 字符串 | 是 | 软件名称，100个字符以内 |
+| software_info.developer | 字符串 | 否 | 开发者信息，100个字符以内 |
+| software_info.launch_date | 数字类型 | 否 | 上架日期（毫秒） |
+| software_info.purchase_type | 字符串 | 是 | 购买类型code，枚举值(含义)：100(订阅) 101(一次性购买) |
+| software_info.remark | 字符串 | 是 | 备注，证明贸易真实性的补充备注或者证据链接，500个字符以内 |
+| collect | 对象 | 否 | 收款信息 |
+| collect.collect_name | 字符串 | 否 | 收款名称（**如果传值会展示在收银台页面标题下**） |
+| collect.collect_detail | 字符串 | 否 | 收款详情 |
+| collect.collect_desc | 字符串 | 否 | 收款描述 |
+| collect.payer | 字符串 | 否 | 付款人 |
+| collect.payee | 字符串 | 否 | 收款人 |
+| buyer | 字符串 | 是 | 买家信息**（[参考贸易类型] 货物贸易非必传，服务贸易必传）**  |
+| buyer.cert_type | 字符串 | 否 | 买家证件类型 |
+| buyer.cert_no | 字符串 | 否 | 买家证件信息 |
+| buyer.country | 字符串 | 是 | 买家国别，ISO代码 |
+| buyer.first_name | 字符串 | 是 | 买家名 |
+| buyer.last_name | 字符串 | 是 | 买家姓 |
+| source | 字符串 | 是 | 默认：S004(独立站) |
+| expire_time_millis | 数字类型 | 否 | 支付单过期时间，多少毫秒后过期 |
+| additional_data | 对象 | 否 | 附加参数 |
+| additional_data.tick_time | 字符串 | 否 | 支付成功页面跳转前倒计时秒数。 参数说明： null、“”、不传参数—不会自动跳转； “0”—立即跳转； “x”—x秒后自动跳转； |
+| additional_data.page_config | 字符串 | 否 | 收银台页面模块自定义展示（**已废弃，替代字段为additional_data.page_config_v2**） |
+| additional_data.page_config_v2 | 字符串 | 否 | 版本收银台页面模块自定义展示（**2023/10/10之后版本页面**），默认”1_1_1_1”，具体参数配置详见“**[收银台页面模块自定义示例](https://showdoc.inflyway.com/web/#/12/127 "收银台页面模块自定义示例")**” **注意：如果传了additional_data.page_config_v2，additional_data.page_config字段将失效，强烈推荐使用additional_data.page_config_v2** |
+| additional_data.open_3ds_type | 字符串 | 否 | 3DS页面打开的方式，默认：方式1。 参数说明： 方式1：null、“”、“0”、不传参数—前端使用window.location.href(3DS地址)方式打开3DS页面； 方式2：“1”—前端使用window.parent.location.replace(3DS地址)方式打开3DS页面； |
+
+#4.响应
+
+| 字段名 | 数据类型 | 是否必传 | 说明 |
+| --- | --- | --- | --- |
+| payment_order_id | 字符串 | 是 | 支付订单ID |
+| payment_order_no | 字符串 | 是 | 支付订单编号 |
+| payment_order_url | 字符串 | 是 | 收银台地址 |
+| hash | 字符串 | 是 | hash值 |
+
+#5.Example
+```json
+
+{
+    "amount": 58.99,
+    "buyer_email": "7421@qq.com",
+    "currency": "EUR",
+    "hash": "026F1159337A2652708C67BFB4D68DDC5A51C1AD204101AE5B9387B581370DCD",
+    "invoice_id": "wuya202511061151",
+    "merchant_id": M200010000000718,
+    "notify_url": "https://everis.me/notify",
+    "order_no": "wuya202511061151",
+    "return_url": "https://everis.me",
+    "goods": [  
+        {  
+            "item_num": 10,  
+            "name": "iphone 15 pro max",  
+            "price": 10,  
+            "unit":"jian"
+        }  
+    ],
+    "shipping": {
+        "address_line": "AAA BBB CCC",
+        "city": "AAA",
+        "country": "US",
+        "email": "aalex@test.com",
+        "first_name": "zhangf",
+        "last_name": "zhangf",
+        "phone": "123123123",
+        "state": "US-AL",
+        "zipcode": "51345"
+    },
+    "additional_data": {
+        "tick_time": 0,
+        "page_config_v2": "1_1_1_0"
+    },
+    "source": "S004"
+}
+```
+
+#6.Output
+```json
+{
+    "reqNo": null,
+    "code": "2000",
+    "message": "操作成功",
+    "data": {
+        "merchant_id": "M200010000000718",
+        "payment_order_id": "e0956fc7258b4751b8eca7a8519f0a027",
+        "payment_order_url": "https://pay-test.inflyway.com/cp-cashier/home?zone=hk&id=e0956fc7258b4751b8eca7a8519f0a027&invoice_id=ZXONE2024120300000004&shipping=1&source=S004",
+        "payment_order_no": "PO20250219200301912120827",
+        "hash": "BFFFFA42FACDA9A42161CDB79B406E0EF639045ECA406F4C39CCE10FDE443F43"
+    },
+    "processing": false,
+    "success": true,
+    "failed": false
+}
+```
+
+
